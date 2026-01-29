@@ -37,6 +37,16 @@ public class DragAreaController : MonoBehaviour
         }
     }
 
+    void OnEnable()
+    {
+        ResetDragState();
+    }
+    public void ResetDragState()
+    {
+        hasDragged = false;
+        isDragging = false;
+    }
+
     IEnumerator EndShakePhaseAfterDelay()
     {
         int count = 3;

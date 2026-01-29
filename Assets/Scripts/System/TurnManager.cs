@@ -3,6 +3,7 @@ using UnityEngine;
 public class TurnManager : MonoBehaviour
 {
     [SerializeField] private GraveSpawner graveSpawner;
+    [SerializeField] private DragAreaController dragAreaController;
 
     public static TurnManager Instance;
 
@@ -28,6 +29,8 @@ public class TurnManager : MonoBehaviour
 
         isShakePhase = true;
         Debug.Log("振りフェーズ開始");
+
+        dragAreaController.ResetDragState();
     }
 
     // DragAreaController から呼ばれる：振りフェーズ終了
