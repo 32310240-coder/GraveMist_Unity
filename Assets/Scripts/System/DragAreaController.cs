@@ -3,6 +3,9 @@ using System.Collections;
 
 public class DragAreaController : MonoBehaviour
 {
+    [SerializeField] private GraveSpawner GraveSpawner;
+
+
     private bool isDragging = false;
     private bool hasDragged = false;
 
@@ -29,6 +32,7 @@ public class DragAreaController : MonoBehaviour
             hasDragged = true;
 
             Debug.Log("ドラッグ終了");
+            GraveSpawner.SpawnGraves();
             StartCoroutine(EndShakePhaseAfterDelay());
         }
     }

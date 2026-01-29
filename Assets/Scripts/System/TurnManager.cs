@@ -2,6 +2,8 @@ using UnityEngine;
 
 public class TurnManager : MonoBehaviour
 {
+    [SerializeField] private GraveSpawner graveSpawner;
+
     public static TurnManager Instance;
 
     // 振りフェーズ中かどうか
@@ -35,5 +37,8 @@ public class TurnManager : MonoBehaviour
 
         isShakePhase = false;
         Debug.Log("振りフェーズ終了");
+
+        graveSpawner.ClearGraves(); // ★ ここで消す
     }
+
 }
