@@ -1,4 +1,4 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 using System.Collections.Generic;
 
 public class GraveSpawner : MonoBehaviour
@@ -9,31 +9,39 @@ public class GraveSpawner : MonoBehaviour
     [SerializeField] private Vector2 minSpawnPos;
     [SerializeField] private Vector2 maxSpawnPos;
 
-    // š ¡o‚Ä‚¢‚é grave ‚ğŠÇ—
+    [SerializeField] private float frontBackRate = 0.8f;
+    [SerializeField] private float sideVerticalRate = 0.19f;
+    [SerializeField] private float upsideDownRate = 0.01f;
+
+    [SerializeField] private Board board;
+
+
+
+    // â˜… ä»Šå‡ºã¦ã„ã‚‹ grave ã‚’ç®¡ç†
     private List<GameObject> spawnedGraves = new List<GameObject>();
 
     public void SpawnGraves()
     {
-        ClearGraves(); // ”O‚Ì‚½‚ßŠù‘¶‚ğÁ‚·
+        ClearGraves();
 
         for (int i = 0; i < spawnCount; i++)
         {
-            float x = Random.Range(minSpawnPos.x, maxSpawnPos.x);
-            float y = Random.Range(minSpawnPos.y, maxSpawnPos.y);
+            Vector2 pos2D = board.GetRandomPositionInside();
+            Vector3 pos = new Vector3(pos2D.x, pos2D.y, 0f);
 
-            GameObject grave = Instantiate(
-                gravePrefab,
-                new Vector3(x, y, 0f),
-                Quaternion.identity
-            );
+            GameObject obj = Instantiate(gravePrefab, pos, Quaternion.identity);
+            spawnedGraves.Add(obj);
 
-            spawnedGraves.Add(grave);
+            Grave grave = obj.GetComponent<Grave>();
+            GraveType type = GetRandomGraveType();
+            grave.SetType(type);
         }
 
-        Debug.Log("grave ‚ğ4‚Â¶¬");
+        Debug.Log("grave ã‚’4ã¤ç”Ÿæˆï¼ˆçŠ¶æ…‹ä»˜ãï¼‰");
     }
 
-    // š U‚èƒtƒF[ƒYI—¹‚ÉŒÄ‚Ô
+
+    // â˜… æŒ¯ã‚Šãƒ•ã‚§ãƒ¼ã‚ºçµ‚äº†æ™‚ã«å‘¼ã¶
     public void ClearGraves()
     {
         foreach (GameObject grave in spawnedGraves)
@@ -45,6 +53,28 @@ public class GraveSpawner : MonoBehaviour
         }
 
         spawnedGraves.Clear();
-        Debug.Log("grave ‚ğ‘S‚Äíœ");
+        Debug.Log("grave ã‚’å…¨ã¦å‰Šé™¤");
     }
+
+    GraveType GetRandomGraveType()
+    {
+        float rand = Random.value; // 0.0ã€œ1.0
+
+        if (rand < upsideDownRate)
+        {
+            return GraveType.UpsideDown;
+        }
+
+        rand -= upsideDownRate;
+
+        if (rand < sideVerticalRate)
+        {
+            // æ¨ª or ç¸¦ã¯50:50
+            return Random.value < 0.5f ? GraveType.Side : GraveType.Vertical;
+        }
+
+        // æ®‹ã‚Šã¯è¡¨ or è£ï¼ˆ80%ï¼‰
+        return Random.value < 0.5f ? GraveType.Front : GraveType.Back;
+    }
+
 }

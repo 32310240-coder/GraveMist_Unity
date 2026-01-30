@@ -4,6 +4,7 @@ public class TurnManager : MonoBehaviour
 {
     [SerializeField] private GraveSpawner graveSpawner;
     [SerializeField] private DragAreaController dragAreaController;
+    [SerializeField] private UIController uiController;
 
     public static TurnManager Instance;
 
@@ -41,7 +42,9 @@ public class TurnManager : MonoBehaviour
         isShakePhase = false;
         Debug.Log("振りフェーズ終了");
 
-        graveSpawner.ClearGraves(); // ★ ここで消す
+        graveSpawner.ClearGraves();
+        uiController.OnShakePhaseEnded();
     }
+
 
 }
