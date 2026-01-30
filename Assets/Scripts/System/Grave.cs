@@ -2,35 +2,32 @@ using UnityEngine;
 
 public class Grave : MonoBehaviour
 {
-    [SerializeField] private SpriteRenderer spriteRenderer;
+    [SerializeField] private MeshRenderer meshRenderer;
 
-    public GraveType CurrentType { get; private set; }
+    private MaterialPropertyBlock block;
+
+    void Awake()
+    {
+        block = new MaterialPropertyBlock();
+    }
 
     public void SetType(GraveType type)
     {
-        CurrentType = type;
-        ApplyColor(type);
+        Color color = GetColor(type);
+        block.SetColor("_BaseColor", color);
+        meshRenderer.SetPropertyBlock(block);
     }
 
-    void ApplyColor(GraveType type)
+    Color GetColor(GraveType type)
     {
         switch (type)
         {
-            case GraveType.Front:
-                spriteRenderer.color = Color.red;
-                break;
-            case GraveType.Back:
-                spriteRenderer.color = Color.blue;
-                break;
-            case GraveType.Side:
-                spriteRenderer.color = Color.yellow;
-                break;
-            case GraveType.Vertical:
-                spriteRenderer.color = Color.green;
-                break;
-            case GraveType.UpsideDown:
-                spriteRenderer.color = new Color(0.5f, 0f, 0.5f); // Ž‡
-                break;
+            case GraveType.Front: return Color.red;
+            case GraveType.Back: return Color.blue;
+            case GraveType.Side: return Color.yellow;
+            case GraveType.Vertical: return Color.green;
+            case GraveType.UpsideDown: return new Color(0.5f, 0f, 0.5f);
+            default: return Color.white;
         }
     }
 }

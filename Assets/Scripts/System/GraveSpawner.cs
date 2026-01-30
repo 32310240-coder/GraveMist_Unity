@@ -4,44 +4,43 @@ using System.Collections.Generic;
 public class GraveSpawner : MonoBehaviour
 {
     [SerializeField] private GameObject gravePrefab;
+    [SerializeField] private BoxCollider boardArea;
+
     [SerializeField] private int spawnCount = 4;
+    [SerializeField] private float spawnHeight = 3.0f;
 
-    [SerializeField] private Vector2 minSpawnPos;
-    [SerializeField] private Vector2 maxSpawnPos;
-
-    [SerializeField] private float frontBackRate = 0.8f;
-    [SerializeField] private float sideVerticalRate = 0.19f;
-    [SerializeField] private float upsideDownRate = 0.01f;
-
-    [SerializeField] private Board board;
-
-
-
-    // ★ 今出ている grave を管理
+    // 生成した grave を管理するリスト
     private List<GameObject> spawnedGraves = new List<GameObject>();
 
     public void SpawnGraves()
     {
-        ClearGraves();
+        ClearGraves(); // 念のため毎回クリア
 
         for (int i = 0; i < spawnCount; i++)
         {
-            Vector2 pos2D = board.GetRandomPositionInside();
-            Vector3 pos = new Vector3(pos2D.x, pos2D.y, 0f);
+            Vector3 spawnPos = GetRandomPositionOnBoard();
+            GameObject graveObj = Instantiate(gravePrefab, spawnPos, Quaternion.identity);
+            spawnedGraves.Add(graveObj);
 
-            GameObject obj = Instantiate(gravePrefab, pos, Quaternion.identity);
-            spawnedGraves.Add(obj);
-
-            Grave grave = obj.GetComponent<Grave>();
-            GraveType type = GetRandomGraveType();
-            grave.SetType(type);
+            Grave grave = graveObj.GetComponent<Grave>();
+            if (grave != null)
+            {
+                GraveType type = GetRandomGraveType();
+                grave.SetType(type);
+            }
         }
+    }
+    private GraveType GetRandomGraveType()
+    {
+        float r = Random.value; // 0.0〜1.0
 
-        Debug.Log("grave を4つ生成（状態付き）");
+        if (r < 0.40f) return GraveType.Front;        // 40%
+        if (r < 0.80f) return GraveType.Back;         // 40%
+        if (r < 0.895f) return GraveType.Side;        // 9.5%
+        if (r < 0.99f) return GraveType.Vertical;     // 9.5%
+        return GraveType.UpsideDown;                  // 1%
     }
 
-
-    // ★ 振りフェーズ終了時に呼ぶ
     public void ClearGraves()
     {
         foreach (GameObject grave in spawnedGraves)
@@ -51,30 +50,17 @@ public class GraveSpawner : MonoBehaviour
                 Destroy(grave);
             }
         }
-
         spawnedGraves.Clear();
-        Debug.Log("grave を全て削除");
     }
 
-    GraveType GetRandomGraveType()
+    private Vector3 GetRandomPositionOnBoard()
     {
-        float rand = Random.value; // 0.0〜1.0
+        Bounds bounds = boardArea.bounds;
 
-        if (rand < upsideDownRate)
-        {
-            return GraveType.UpsideDown;
-        }
+        float x = Random.Range(bounds.min.x, bounds.max.x);
+        float z = Random.Range(bounds.min.z, bounds.max.z);
+        float y = bounds.max.y + spawnHeight;
 
-        rand -= upsideDownRate;
-
-        if (rand < sideVerticalRate)
-        {
-            // 横 or 縦は50:50
-            return Random.value < 0.5f ? GraveType.Side : GraveType.Vertical;
-        }
-
-        // 残りは表 or 裏（80%）
-        return Random.value < 0.5f ? GraveType.Front : GraveType.Back;
+        return new Vector3(x, y, z);
     }
-
 }
